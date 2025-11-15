@@ -91,16 +91,8 @@ public partial class MainViewModel : ObservableObject
             _vosk.OnFinalResult += Vosk_OnFinalResult;
             _vosk.OnError += Vosk_OnError;
             
-            // Initialize overlay window for Windows
-            try
-            {
-                _overlayWindow = new Platforms.Windows.SubtitleOverlayWindow();
-                _overlayWindow.Initialize();
-            }
-            catch
-            {
-                // Overlay not available on this platform or initialization failed
-            }
+            // Don't initialize overlay yet - will create when capturing starts
+            _overlayWindow = null;
 
             StatusMessage = "Ready to capture";
         }
@@ -202,6 +194,21 @@ public partial class MainViewModel : ObservableObject
             _subtitleEngine.Clear();
             Subtitles.Clear();
             CurrentTranscription = string.Empty;
+
+            // Initialize overlay window when starting capture
+            if (_overlayWindow == null)
+            {
+                try
+                {
+                    _overlayWindow = new Platforms.Windows.SubtitleOverlayWindow();
+                    _overlayWindow.Initialize();
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage = $"Overlay initialization failed: {ex.Message}";
+                    // Continue anyway - can work without overlay
+                }
+            }
 
             await _audioCapture.StartAsync();
             IsCapturing = true;
