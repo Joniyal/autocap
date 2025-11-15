@@ -288,6 +288,24 @@ public partial class MainViewModel : ObservableObject
         StatusMessage = "Subtitles cleared";
     }
 
+    public void UpdateOverlayFontSize(float fontSize)
+    {
+        _overlayWindow?.SetFontSize(fontSize);
+    }
+
+    public void UpdateOverlayPosition(int bottomMargin)
+    {
+        if (_overlayWindow == null) return;
+        
+        // Recalculate overlay position based on bottom margin
+        int screenWidth = (int)Microsoft.Maui.Devices.DeviceDisplay.Current.MainDisplayInfo.Width;
+        int screenHeight = (int)Microsoft.Maui.Devices.DeviceDisplay.Current.MainDisplayInfo.Height;
+        int subtitleHeight = 120;
+        int yPosition = screenHeight - subtitleHeight - bottomMargin;
+        
+        _overlayWindow.SetPosition(0, yPosition, screenWidth, subtitleHeight);
+    }
+
     private int _audioFrameCount = 0;
     
     private void OnAudioFrameReceived(object? sender, AudioFrameEventArgs e)

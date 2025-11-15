@@ -43,4 +43,20 @@ public partial class MainPage : ContentPage
     {
         await Navigation.PushAsync(new Views.HelpPage());
     }
+
+    private void OnFontSizeChanged(object sender, ValueChangedEventArgs e)
+    {
+        if (BindingContext is MainViewModel vm)
+        {
+            vm.UpdateOverlayFontSize((float)e.NewValue);
+        }
+    }
+
+    private void OnPositionChanged(object sender, ValueChangedEventArgs e)
+    {
+        if (BindingContext is MainViewModel vm)
+        {
+            vm.UpdateOverlayPosition((int)e.NewValue);
+        }
+    }
 }

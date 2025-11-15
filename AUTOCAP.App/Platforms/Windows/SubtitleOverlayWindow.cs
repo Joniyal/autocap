@@ -53,51 +53,47 @@ public class SubtitleOverlayWindow : IDisposable
         // Remove system backdrop for full transparency
         _overlayWindow.SystemBackdrop = null;
         
-        // Create subtitle text with black outline effect for readability
+        // Create subtitle text - PURE TEXT with outline effect, no background box
         _subtitleText = new TextBlock
         {
             Text = "",
-            FontSize = 42,
+            FontSize = 36,
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             Foreground = new SolidColorBrush(Colors.White),
             TextAlignment = TextAlignment.Center,
             TextWrapping = TextWrapping.Wrap,
-            Padding = new Thickness(15, 8, 15, 8)
+            Padding = new Thickness(20)
         };
         
-        // Semi-transparent black background only around text (like real subtitles)
-        var subtitleBorder = new Border
-        {
-            Background = new SolidColorBrush(ColorHelper.FromArgb(140, 0, 0, 0)), // 55% opacity black
-            CornerRadius = new CornerRadius(4),
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Bottom,
-            Margin = new Thickness(0, 0, 0, 60), // 60px from bottom
-            MaxWidth = 1200, // Limit width
-            Child = _subtitleText
-        };
+        // Add text stroke/outline for visibility on any background
+        // This creates the effect like in the screenshot
+        var strokeGeometry = new Microsoft.UI.Xaml.Media.GeometryGroup();
         
-        // Fully transparent grid
+        // Fully transparent grid - NO BACKGROUND AT ALL
         var grid = new Grid
         {
             Background = new SolidColorBrush(Colors.Transparent),
-            Children = { subtitleBorder }
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Bottom,
+            Margin = new Thickness(0, 0, 0, 80),
+            MaxWidth = 1400
         };
+        grid.Children.Add(_subtitleText);
         
         _overlayWindow.Content = grid;
         
         // Activate window (but hide it initially)
         _overlayWindow.Activate();
         
-        // Get window handle and make it small subtitle bar at bottom
+        // Get window handle
         var hwnd = WindowNative.GetWindowHandle(_overlayWindow);
         
         // Get screen dimensions
         int screenWidth = (int)Microsoft.Maui.Devices.DeviceDisplay.Current.MainDisplayInfo.Width;
         int screenHeight = (int)Microsoft.Maui.Devices.DeviceDisplay.Current.MainDisplayInfo.Height;
         
-        // Position at bottom of screen - only 150px tall subtitle bar
-        int subtitleHeight = 150;
+        // Position at bottom of screen - only 120px tall for text
+        int subtitleHeight = 120;
         int yPosition = screenHeight - subtitleHeight;
         SetWindowPos(hwnd, HWND_TOPMOST, 0, yPosition, screenWidth, subtitleHeight, SWP_NOACTIVATE);
         
@@ -149,6 +145,26 @@ public class SubtitleOverlayWindow : IDisposable
         
         var hwnd = WindowNative.GetWindowHandle(_overlayWindow)!;
         SetWindowPos(hwnd, HWND_TOPMOST, x, y, width, height, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+    }
+    
+    public void SetFontSize(float size)
+    {
+        if (_subtitleText == null) return;
+        
+        _overlayWindow?.DispatcherQueue.TryEnqueue(() =>
+        {
+            _subtitleText.FontSize = size;
+        });
+    }
+    
+    public void SetTextColor(byte r, byte g, byte b)
+    {
+        if (_subtitleText == null) return;
+        
+        _overlayWindow?.DispatcherQueue.TryEnqueue(() =>
+        {
+            _subtitleText.Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, r, g, b));
+        });
     }
 
     public void Dispose()

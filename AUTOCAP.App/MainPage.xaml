@@ -69,6 +69,27 @@
                 </VerticalStackLayout>
             </Frame>
 
+            <!-- Subtitle Overlay Settings -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Subtitle Overlay" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    
+                    <Label Text="Font Size" FontSize="12" TextColor="#aaa" />
+                    <Slider x:Name="FontSizeSlider" Minimum="24" Maximum="72" Value="36" 
+                            ValueChanged="OnFontSizeChanged" 
+                            MinimumTrackColor="#0d47a1" MaximumTrackColor="#555" />
+                    <Label Text="{Binding Source={x:Reference FontSizeSlider}, Path=Value, StringFormat='Size: {0:F0}px'}" 
+                           FontSize="11" TextColor="#888" />
+                    
+                    <Label Text="Vertical Position" FontSize="12" TextColor="#aaa" />
+                    <Slider x:Name="PositionSlider" Minimum="50" Maximum="300" Value="80" 
+                            ValueChanged="OnPositionChanged"
+                            MinimumTrackColor="#0d47a1" MaximumTrackColor="#555" />
+                    <Label Text="{Binding Source={x:Reference PositionSlider}, Path=Value, StringFormat='Bottom margin: {0:F0}px'}" 
+                           FontSize="11" TextColor="#888" />
+                </VerticalStackLayout>
+            </Frame>
+
             <!-- Subtitles Preview -->
             <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
                 <VerticalStackLayout Spacing="10">
