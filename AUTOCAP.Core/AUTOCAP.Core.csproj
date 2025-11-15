@@ -13,6 +13,7 @@
 		
 		<!-- JSON handling -->
 		<PackageReference Include="System.Text.Json" Version="8.0.5" />
+		<PackageReference Include="Vosk" Version="0.3.38" />
 	</ItemGroup>
 
 </Project>
