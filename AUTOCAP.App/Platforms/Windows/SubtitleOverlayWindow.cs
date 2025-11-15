@@ -26,6 +26,9 @@ public class SubtitleOverlayWindow : IDisposable
     
     [DllImport("user32.dll")]
     private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+    
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
     private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
     private const int GWL_EXSTYLE = -20;
@@ -35,6 +38,9 @@ public class SubtitleOverlayWindow : IDisposable
     private const uint SWP_NOMOVE = 0x0002;
     private const uint SWP_NOACTIVATE = 0x0010;
     private const uint SWP_SHOWWINDOW = 0x0040;
+    private const uint SWP_HIDEWINDOW = 0x0080;
+    private const int SW_HIDE = 0;
+    private const int SW_SHOWNOACTIVATE = 4;
 
     public void Initialize()
     {
@@ -73,7 +79,7 @@ public class SubtitleOverlayWindow : IDisposable
         
         _overlayWindow.Content = grid;
         
-        // Activate window (but it will be invisible until text is shown)
+        // Activate window (but hide it initially)
         _overlayWindow.Activate();
         
         // Get window handle and make it fullscreen, topmost, and click-through
@@ -84,11 +90,14 @@ public class SubtitleOverlayWindow : IDisposable
         int screenHeight = (int)Microsoft.Maui.Devices.DeviceDisplay.Current.MainDisplayInfo.Height;
         
         // Make fullscreen and topmost
-        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, screenWidth, screenHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, screenWidth, screenHeight, SWP_NOACTIVATE);
         
         // Make window click-through (transparent to mouse and keyboard)
         int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
         SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
+        
+        // Hide window initially - will only show when there's subtitle text
+        ShowWindow(hwnd, SW_HIDE);
     }
 
     public void ShowSubtitle(string text)
@@ -101,7 +110,13 @@ public class SubtitleOverlayWindow : IDisposable
         _overlayWindow.DispatcherQueue.TryEnqueue(() =>
         {
             _subtitleText.Text = text;
-            _overlayWindow.Activate(); // Ensure visible
+            
+            // Only show window if there's actual text to display
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                var hwnd = WindowNative.GetWindowHandle(_overlayWindow);
+                ShowWindow(hwnd, SW_SHOWNOACTIVATE);
+            }
         });
     }
 
@@ -112,6 +127,10 @@ public class SubtitleOverlayWindow : IDisposable
         _overlayWindow.DispatcherQueue.TryEnqueue(() =>
         {
             _subtitleText.Text = "";
+            
+            // Hide the window when no text
+            var hwnd = WindowNative.GetWindowHandle(_overlayWindow);
+            ShowWindow(hwnd, SW_HIDE);
         });
     }
     
