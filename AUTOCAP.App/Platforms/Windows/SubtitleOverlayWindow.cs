@@ -38,51 +38,55 @@ public class SubtitleOverlayWindow : IDisposable
 
     public void Initialize()
     {
-        // Create overlay window on UI thread
+        // Create a borderless, completely transparent overlay window
         _overlayWindow = new Window
         {
-            Title = "AUTOCAP Subtitles",
-            SystemBackdrop = new MicaBackdrop() // Transparent mica effect
+            Title = "AUTOCAP Subtitles"
         };
         
-        // Create subtitle text block with shadow effect
+        // Remove system backdrop for full transparency
+        _overlayWindow.SystemBackdrop = null;
+        
+        // Create subtitle text block with drop shadow for readability
         _subtitleText = new TextBlock
         {
             Text = "",
-            FontSize = 32,
-            // FontWeight = Bold (set via styles if needed)
+            FontSize = 48, // Larger for better visibility
+            FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             Foreground = new SolidColorBrush(Colors.White),
             TextAlignment = TextAlignment.Center,
             TextWrapping = TextWrapping.Wrap,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Bottom,
-            Margin = new Thickness(20, 20, 20, 100) // Bottom margin for typical subtitle position
+            Margin = new Thickness(40, 0, 40, 80) // Bottom margin for subtitle positioning
         };
         
-        // Black semi-transparent background
-        var background = new Border
-        {
-            Background = new SolidColorBrush(ColorHelper.FromArgb(180, 0, 0, 0)),
-            CornerRadius = new CornerRadius(8),
-            Padding = new Thickness(20),
-            Child = _subtitleText
-        };
+        // Add text shadow/outline effect for readability on any background
+        _subtitleText.Shadow = new Microsoft.UI.Xaml.Media.ThemeShadow();
         
+        // Transparent grid - no visible background
         var grid = new Grid
         {
-            Children = { background }
+            Background = new SolidColorBrush(Colors.Transparent),
+            Children = { _subtitleText }
         };
         
         _overlayWindow.Content = grid;
         
-        // Set window size and position at bottom of screen
+        // Activate window (but it will be invisible until text is shown)
         _overlayWindow.Activate();
         
-        // Make window topmost and click-through
+        // Get window handle and make it fullscreen, topmost, and click-through
         var hwnd = WindowNative.GetWindowHandle(_overlayWindow);
-        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
         
-        // Make window click-through (transparent to mouse)
+        // Get screen dimensions
+        int screenWidth = (int)Microsoft.Maui.Devices.DeviceDisplay.Current.MainDisplayInfo.Width;
+        int screenHeight = (int)Microsoft.Maui.Devices.DeviceDisplay.Current.MainDisplayInfo.Height;
+        
+        // Make fullscreen and topmost
+        SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, screenWidth, screenHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
+        
+        // Make window click-through (transparent to mouse and keyboard)
         int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
         SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
     }
