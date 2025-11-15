@@ -1,16 +1,18 @@
 using System.Text.Json;
+using Vosk;
 
 namespace AUTOCAP.Core.ASR;
 
 /// <summary>
 /// Wrapper around Vosk offline speech recognizer.
 /// Handles model loading, frame processing, and result event emission.
-/// For production, install the Vosk NuGet package.
 /// </summary>
 public class VoskRecognizer : IDisposable
 {
     private bool _isInitialized = false;
     private readonly int _sampleRate;
+    private Model? _model;
+    private Vosk.VoskRecognizer? _recognizer;
 
     /// <summary>
     /// Raised when partial recognition result is available (interim hypothesis)
@@ -30,6 +32,7 @@ public class VoskRecognizer : IDisposable
     public VoskRecognizer(int sampleRate = 16000)
     {
         _sampleRate = sampleRate;
+        Vosk.Vosk.SetLogLevel(-1); // Disable Vosk logging
     }
 
     /// <summary>
@@ -46,7 +49,10 @@ public class VoskRecognizer : IDisposable
                 return false;
             }
 
-            // Initialize recognizer (stub for demo - Vosk package not available)
+            // Load Vosk model
+            _model = new Model(modelPath);
+            _recognizer = new Vosk.VoskRecognizer(_model, _sampleRate);
+            
             _isInitialized = true;
             return true;
         }
@@ -60,15 +66,10 @@ public class VoskRecognizer : IDisposable
     /// <summary>
     /// Process audio frame (PCM 16-bit mono at initialized sample rate).
     /// Returns true if final result was generated, false if partial.
-    /// For demo, simulates ASR with mock results.
     /// </summary>
-    private int _frameCount = 0;
-    private Random _random = new Random();
-    private string[] _demoWords = { "hello", "world", "this", "is", "a", "demo", "subtitle", "test", "application", "working", "correctly" };
-    
     public bool AcceptWaveform(byte[] audioData)
     {
-        if (!_isInitialized)
+        if (!_isInitialized || _recognizer == null)
         {
             OnError?.Invoke(this, "Recognizer not initialized");
             return false;
@@ -76,29 +77,23 @@ public class VoskRecognizer : IDisposable
 
         try
         {
-            // Demo: simulate recognition with mock results
-            _frameCount++;
+            // Process audio with real Vosk recognizer
+            bool isFinal = _recognizer.AcceptWaveform(audioData, audioData.Length);
             
-            // Every 10 frames, emit a partial result
-            if (_frameCount % 10 == 0)
+            if (isFinal)
             {
-                string partial = _demoWords[_random.Next(_demoWords.Length)];
-                OnPartialResult?.Invoke(this, new PartialResultEventArgs { Text = partial });
-            }
-            
-            // Every 50 frames, emit a final result
-            if (_frameCount % 50 == 0)
-            {
-                string finalText = $"{_demoWords[_random.Next(_demoWords.Length)]} {_demoWords[_random.Next(_demoWords.Length)]} {_demoWords[_random.Next(_demoWords.Length)]}";
-                OnFinalResult?.Invoke(this, new FinalResultEventArgs 
-                { 
-                    Text = finalText,
-                    Timestamp = DateTime.UtcNow 
-                });
+                // Final result available
+                string jsonResult = _recognizer.FinalResult();
+                ProcessFinalResult(jsonResult);
                 return true;
             }
-            
-            return false;
+            else
+            {
+                // Partial result
+                string jsonResult = _recognizer.PartialResult();
+                ProcessPartialResult(jsonResult);
+                return false;
+            }
         }
         catch (Exception ex)
         {
@@ -180,6 +175,8 @@ public class VoskRecognizer : IDisposable
 
     public void Dispose()
     {
+        _recognizer?.Dispose();
+        _model?.Dispose();
         _isInitialized = false;
     }
 }

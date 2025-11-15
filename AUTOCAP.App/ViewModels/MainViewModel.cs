@@ -288,9 +288,22 @@ public partial class MainViewModel : ObservableObject
         StatusMessage = "Subtitles cleared";
     }
 
+    private int _audioFrameCount = 0;
+    
     private void OnAudioFrameReceived(object? sender, AudioFrameEventArgs e)
     {
         // Send audio data to Vosk for real-time recognition
+        _audioFrameCount++;
+        
+        // Log every 100 frames to verify audio is coming through
+        if (_audioFrameCount % 100 == 0)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                StatusMessage = $"Audio frames received: {_audioFrameCount}";
+            });
+        }
+        
         _vosk?.AcceptWaveform(e.Buffer);
     }
 
