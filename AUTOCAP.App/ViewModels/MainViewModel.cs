@@ -19,6 +19,7 @@ public partial class MainViewModel : ObservableObject
     private readonly SubtitleEngine _subtitleEngine = new();
     private readonly VoskModelManager? _modelManager;
     private readonly SessionDatabaseService? _sessionDb;
+    private Platforms.Windows.SubtitleOverlayWindow? _overlayWindow;
 
     [ObservableProperty]
     private bool isCapturing = false;
@@ -77,12 +78,29 @@ public partial class MainViewModel : ObservableObject
 
             // Platform-specific audio capture
             _audioCapture = GetPlatformAudioCapture();
+            
+            // Wire audio capture to send data to recognizer
+            if (_audioCapture != null)
+            {
+                _audioCapture.OnAudioFrame += OnAudioFrameReceived;
+            }
 
             // Initialize Vosk
             _vosk = new VoskRecognizer(16000);
             _vosk.OnPartialResult += Vosk_OnPartialResult;
             _vosk.OnFinalResult += Vosk_OnFinalResult;
             _vosk.OnError += Vosk_OnError;
+            
+            // Initialize overlay window for Windows
+            try
+            {
+                _overlayWindow = new Platforms.Windows.SubtitleOverlayWindow();
+                _overlayWindow.Initialize();
+            }
+            catch
+            {
+                // Overlay not available on this platform or initialization failed
+            }
 
             StatusMessage = "Ready to capture";
         }
@@ -206,6 +224,9 @@ public partial class MainViewModel : ObservableObject
             _subtitleEngine.FlushCurrentLine();
             IsCapturing = false;
             StatusMessage = "Stopped";
+            
+            // Hide overlay when stopped
+            _overlayWindow?.HideOverlay();
         }
         catch (Exception ex)
         {
@@ -260,12 +281,21 @@ public partial class MainViewModel : ObservableObject
         StatusMessage = "Subtitles cleared";
     }
 
+    private void OnAudioFrameReceived(object? sender, AudioFrameEventArgs e)
+    {
+        // Send audio data to Vosk for real-time recognition
+        _vosk?.AcceptWaveform(e.Buffer);
+    }
+
     private void Vosk_OnPartialResult(object? sender, PartialResultEventArgs e)
     {
         MainThread.BeginInvokeOnMainThread(() =>
         {
             CurrentTranscription = e.Text;
             _subtitleEngine.ProcessPartialResult(e.Text);
+            
+            // Show partial result in overlay window
+            _overlayWindow?.ShowSubtitle(e.Text);
         });
     }
 
@@ -274,6 +304,9 @@ public partial class MainViewModel : ObservableObject
         MainThread.BeginInvokeOnMainThread(() =>
         {
             _subtitleEngine.ProcessFinalResult(e.Text);
+            
+            // Show final result in overlay window
+            _overlayWindow?.ShowSubtitle(e.Text);
         });
     }
 
@@ -296,6 +329,9 @@ public partial class MainViewModel : ObservableObject
                 StartTime = line.StartTime,
                 EndTime = line.EndTime
             });
+            
+            // Show complete subtitle line in overlay
+            _overlayWindow?.ShowSubtitle(line.Text);
         });
     }
 
@@ -304,6 +340,9 @@ public partial class MainViewModel : ObservableObject
         MainThread.BeginInvokeOnMainThread(() =>
         {
             CurrentTranscription = text;
+            
+            // Show partial subtitle in overlay
+            _overlayWindow?.ShowSubtitle(text);
         });
     }
 
