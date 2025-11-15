@@ -62,6 +62,10 @@ public class VoskRecognizer : IDisposable
     /// Returns true if final result was generated, false if partial.
     /// For demo, simulates ASR with mock results.
     /// </summary>
+    private int _frameCount = 0;
+    private Random _random = new Random();
+    private string[] _demoWords = { "hello", "world", "this", "is", "a", "demo", "subtitle", "test", "application", "working", "correctly" };
+    
     public bool AcceptWaveform(byte[] audioData)
     {
         if (!_isInitialized)
@@ -72,8 +76,28 @@ public class VoskRecognizer : IDisposable
 
         try
         {
-            // Demo: simulate recognition
-            // Real implementation would call actual Vosk library
+            // Demo: simulate recognition with mock results
+            _frameCount++;
+            
+            // Every 10 frames, emit a partial result
+            if (_frameCount % 10 == 0)
+            {
+                string partial = _demoWords[_random.Next(_demoWords.Length)];
+                OnPartialResult?.Invoke(this, new PartialResultEventArgs { Text = partial });
+            }
+            
+            // Every 50 frames, emit a final result
+            if (_frameCount % 50 == 0)
+            {
+                string finalText = $"{_demoWords[_random.Next(_demoWords.Length)]} {_demoWords[_random.Next(_demoWords.Length)]} {_demoWords[_random.Next(_demoWords.Length)]}";
+                OnFinalResult?.Invoke(this, new FinalResultEventArgs 
+                { 
+                    Text = finalText,
+                    Timestamp = DateTime.UtcNow 
+                });
+                return true;
+            }
+            
             return false;
         }
         catch (Exception ex)
