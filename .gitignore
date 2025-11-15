@@ -1,0 +1,99 @@
+# User-specific files
+**/.vs/
+**/.vscode/
+**/*.suo
+**/*.user
+**/*.userosscache
+**/*.sln.docstates
+
+# Local environment
+**/bin/
+**/obj/
+**/dist/
+**/.env
+**/.env.local
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# NuGet
+**/packages/
+**/.nuget/
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+# Visual Studio cache/options
+.vs/
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+
+# Test results
+TestResults/
+*.trx
+
+# App runtime files
+**/*.db
+**/*.db-journal
+**/*.log
+
+# Vosk models (large, typically downloaded at runtime)
+**/vosk_models/
+
+# Exported subtitles (user files)
+**/*.srt
+**/*.vtt
+
+# Platform-specific
+**/Platforms/**/*.o
+**/Platforms/**/*.dylib
+**/Platforms/**/*.so
+**/Platforms/**/*.dll (except packages)
+
+# MAUI specific
+.maui/
+
+# Android
+**/Android/bin/
+**/Android/obj/
+**/Android/.gradle/
+**/Android/local.properties
+**/Android/**/.idea/
+**/Android/**/build/
+
+# iOS
+**/iOS/bin/
+**/iOS/obj/
+**/iOS/Pods/
+**/iOS/Podfile.lock
+**/iOS/**/.xcworkspace/
+**/iOS/**/*.xcodeproj/
+
+# macOS
+**/MacCatalyst/bin/
+**/MacCatalyst/obj/
+**/MacCatalyst/.xcworkspace/
+
+# Temporary files
+**/Temp/
+**/tmp/
+**/*.tmp
+**/*.bak
+
+# OS-specific
+.DS_Store
+Thumbs.db
+ehthumbs.db

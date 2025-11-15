@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AUTOCAP.App.Views.SessionsPage"
+             Title="Sessions"
+             BackgroundColor="#1e1e1e">
+
+    <VerticalStackLayout Padding="20" Spacing="15">
+        <Label Text="Saved Sessions" FontSize="16" FontAttributes="Bold" TextColor="#fff" />
+        
+        <CollectionView x:Name="SessionsCollectionView" SelectionMode="Single">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d" Margin="0,5">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="{Binding Title}" FontSize="13" FontAttributes="Bold" TextColor="#fff" />
+                            <Label Text="{Binding CreatedAt, StringFormat='Created: {0:yyyy-MM-dd HH:mm}'}" FontSize="11" TextColor="#aaa" />
+                            <Label Text="{Binding LineCount, StringFormat='Lines: {0}'}" FontSize="11" TextColor="#aaa" />
+                            <Label Text="{Binding AudioSource}" FontSize="10" TextColor="#888" />
+                            <HorizontalStackLayout Spacing="10">
+                                <Button Text="View" BackgroundColor="#0d47a1" TextColor="White" CornerRadius="5" FontSize="11" Padding="10,5" />
+                                <Button Text="Export" BackgroundColor="#1b5e20" TextColor="White" CornerRadius="5" FontSize="11" Padding="10,5" />
+                                <Button Text="Delete" BackgroundColor="#c62828" TextColor="White" CornerRadius="5" FontSize="11" Padding="10,5" />
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+
+</ContentPage>

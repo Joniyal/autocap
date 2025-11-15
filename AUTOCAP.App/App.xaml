@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:AUTOCAP.App.Converters"
+             x:Class="AUTOCAP.App.App">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <!-- Value Converters -->
+            <converters:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <converters:IsCapturingColorConverter x:Key="IsCapturingColorConverter" />
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>

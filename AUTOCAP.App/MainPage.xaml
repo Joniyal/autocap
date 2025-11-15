@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AUTOCAP.App.MainPage"
+             Title="AUTOCAP"
+             BackgroundColor="#1e1e1e">
+
+    <Grid RowDefinitions="*,auto" Padding="20">
+        
+        <!-- Main Content -->
+        <VerticalStackLayout Spacing="15" Padding="0">
+            
+            <!-- Status Section -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Status" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    <Label Text="{Binding StatusMessage}" FontSize="12" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    <Label Text="{Binding AudioSource}" FontSize="11" TextColor="#888" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Model Manager -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Vosk Model" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    <Button Text="Initialize/Download Model" 
+                            Command="{Binding InitializeModelCommand}"
+                            IsEnabled="{Binding IsDownloadingModel, Converter={StaticResource InvertedBoolConverter}}"
+                            BackgroundColor="#0d47a1" TextColor="White" FontAttributes="Bold" CornerRadius="5" />
+                    
+                    <ProgressBar Progress="{Binding DownloadProgress}" 
+                                 IsVisible="{Binding IsDownloadingModel}"
+                                 ProgressColor="#0d47a1" />
+                    <Label Text="{Binding DownloadProgress, StringFormat='{0:P0}'}" 
+                           FontSize="11" TextColor="#888"
+                           IsVisible="{Binding IsDownloadingModel}" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Capture Controls -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Capture" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    <Button x:Name="CaptureButton"
+                            Command="{Binding ToggleCaptureCommand}"
+                            BackgroundColor="{Binding IsCapturing, Converter={StaticResource IsCapturingColorConverter}}"
+                            TextColor="White" FontAttributes="Bold" CornerRadius="5" Padding="15" FontSize="16">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsCapturing}" Value="True">
+                                <Setter Property="Text" Value="Stop Capture" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsCapturing}" Value="False">
+                                <Setter Property="Text" Value="Start Capture" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Live Transcription -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Live Transcription" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    <Frame BorderColor="#555" CornerRadius="5" Padding="10" HasShadow="False" BackgroundColor="#1a1a1a">
+                        <Label Text="{Binding CurrentTranscription}" 
+                               FontSize="13" TextColor="#0f0" 
+                               LineBreakMode="WordWrap" />
+                    </Frame>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Subtitles Preview -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Subtitle Preview" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    <CollectionView ItemsSource="{Binding Subtitles}" SelectionMode="Single">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout Padding="10" Spacing="5">
+                                    <Label Text="{Binding Text}" FontSize="12" TextColor="#fff" LineBreakMode="WordWrap" />
+                                    <Label Text="{Binding StartTime, StringFormat='Start: {0:mm\\:ss\\.ff}'}" 
+                                           FontSize="10" TextColor="#888" />
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Export & Actions -->
+            <VerticalStackLayout Spacing="10">
+                <Button Text="Export as SRT" 
+                        Command="{Binding ExportSRTCommand}"
+                        BackgroundColor="#1b5e20" TextColor="White" FontAttributes="Bold" CornerRadius="5" />
+                <Button Text="Clear All Subtitles" 
+                        Command="{Binding ClearSubtitlesCommand}"
+                        BackgroundColor="#c62828" TextColor="White" FontAttributes="Bold" CornerRadius="5" />
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+
+        <!-- Bottom Navigation -->
+        <HorizontalStackLayout Grid.Row="1" Spacing="10" Padding="0,15,0,0">
+            <Button Text="Settings" 
+                    Clicked="OnSettingsClicked"
+                    BackgroundColor="#424242" TextColor="White" FontAttributes="Bold" CornerRadius="5"
+                    HorizontalOptions="FillAndExpand" />
+            <Button Text="Sessions" 
+                    Clicked="OnSessionsClicked"
+                    BackgroundColor="#424242" TextColor="White" FontAttributes="Bold" CornerRadius="5"
+                    HorizontalOptions="FillAndExpand" />
+            <Button Text="Help" 
+                    Clicked="OnHelpClicked"
+                    BackgroundColor="#424242" TextColor="White" FontAttributes="Bold" CornerRadius="5"
+                    HorizontalOptions="FillAndExpand" />
+        </HorizontalStackLayout>
+
+    </Grid>
+
+</ContentPage>

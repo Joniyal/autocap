@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Required Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Optional: For Android 10+ system audio capture -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.CONFIGURE_VOICEMAIL" />
+        </intent>
+    </queries>
+
+    <application>
+        
+        <!-- Main Activity -->
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Maui.SplashTheme"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Overlay Service (for subtitle display) -->
+        <service
+            android:name=".Services.OverlayService"
+            android:exported="false" />
+
+        <!-- Accessibility Service (for system audio capture fallback) -->
+        <!-- TODO: Implement if needed for audio capture fallback -->
+
+    </application>
+
+</manifest>

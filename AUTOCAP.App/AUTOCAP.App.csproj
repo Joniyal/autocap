@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<OutputType>WinExe</OutputType>
+		<UseMAUI>true</UseMAUI>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<WindowsPackageType>None</WindowsPackageType>
+
+		<!-- App Display -->
+		<ApplicationTitle>AUTOCAP</ApplicationTitle>
+		<ApplicationId>com.autocap.app</ApplicationId>
+		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+
+		<!-- Platform-specific -->
+		<SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- MAUI UI Toolkit -->
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.0" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+		
+		<!-- Permissions -->
+		<PackageReference Include="Plugin.Permissions" Version="6.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Reference Core library -->
+		<ProjectReference Include="..\AUTOCAP.Core\AUTOCAP.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- App Icons & Splash -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Fonts -->
+		<MauiFont Include="Resources\Fonts\**\*.ttf" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Images -->
+		<MauiImage Include="Resources\Images\*" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Raw Assets -->
+		<MauiAsset Include="Resources\Raw\**" />
+	</ItemGroup>
+
+</Project>

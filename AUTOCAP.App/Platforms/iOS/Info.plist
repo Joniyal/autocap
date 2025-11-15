@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- App Identification -->
+    <key>CFBundleName</key>
+    <string>AUTOCAP</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.autocap.app</string>
+
+    <!-- Microphone Usage -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>AUTOCAP needs microphone access to capture and generate subtitles from audio.</string>
+
+    <!-- iOS Limitation Notice (shown in app) -->
+    <key>NSLocalizedDescription</key>
+    <string>AUTOCAP: Offline AI Subtitle Generator</string>
+
+    <!-- Supported Orientations -->
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <!-- Supported iPad Orientations -->
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <!-- Minimum iOS Version -->
+    <key>MinimumOSVersion</key>
+    <string>14.0</string>
+
+    <!-- Audio Session Configuration -->
+    <key>AVAudioSessionCategory</key>
+    <string>RecordAudio</string>
+    <key>AVAudioSessionCategoryOptions</key>
+    <array>
+        <string>MixWithOthers</string>
+        <string>DuckOthers</string>
+    </array>
+
+    <!-- Privacy Policy URL (optional) -->
+    <key>NSPrivacyTracking</key>
+    <false/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+
+</dict>
+</plist>

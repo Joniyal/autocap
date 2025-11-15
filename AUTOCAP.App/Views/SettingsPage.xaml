@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AUTOCAP.App.Views.SettingsPage"
+             Title="Settings"
+             BackgroundColor="#1e1e1e">
+
+    <VerticalStackLayout Padding="20" Spacing="15">
+        
+        <!-- Subtitle Display Settings -->
+        <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Subtitle Display" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Font Size" FontSize="12" TextColor="#aaa" />
+                    <Slider Minimum="10" Maximum="40" Value="18" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Background Opacity" FontSize="12" TextColor="#aaa" />
+                    <Slider Minimum="0" Maximum="1" Value="0.8" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Subtitle Delay (ms)" FontSize="12" TextColor="#aaa" />
+                    <Slider Minimum="-500" Maximum="2000" Value="0" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- ASR Settings -->
+        <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Recognition Settings" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                
+                <VerticalStackLayout Spacing="8">
+                    <CheckBox />
+                    <Label Text="Auto-Capitalize" FontSize="12" TextColor="#aaa" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <CheckBox />
+                    <Label Text="Auto-Punctuate" FontSize="12" TextColor="#aaa" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <CheckBox />
+                    <Label Text="Low CPU Mode (slower but uses less battery)" FontSize="12" TextColor="#aaa" />
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Privacy & Permissions -->
+        <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Privacy" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                <Label Text="✓ All processing is local - audio is never sent to cloud servers" 
+                       FontSize="11" TextColor="#0f0" LineBreakMode="WordWrap" />
+                <Label Text="All subtitles are stored locally on your device." 
+                       FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- About -->
+        <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+            <VerticalStackLayout Spacing="10">
+                <Label Text="About AUTOCAP" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                <Label Text="Version 1.0" FontSize="11" TextColor="#aaa" />
+                <Label Text="Offline AI Video Subtitle Generator" FontSize="11" TextColor="#aaa" />
+                <Label Text="Open Source: MIT License" FontSize="11" TextColor="#aaa" />
+                <Button Text="View Licenses" BackgroundColor="#424242" TextColor="White" CornerRadius="5" />
+            </VerticalStackLayout>
+        </Frame>
+
+    </VerticalStackLayout>
+
+</ContentPage>

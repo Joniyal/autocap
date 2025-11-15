@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="AUTOCAP.App.Views.HelpPage"
+             Title="Help and Information"
+             BackgroundColor="#1e1e1e">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="15">
+            
+            <!-- Platform Limitations -->
+            <Frame BorderColor="#d32f2f" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#b71c1c1a">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Platform Limitations" FontSize="14" FontAttributes="Bold" TextColor="#ff5252" />
+                    <Label Text="iOS: Cannot capture internal device audio due to OS restrictions. Use microphone capture only." 
+                           FontSize="12" TextColor="#fff" LineBreakMode="WordWrap" />
+                    <Label Text="macOS: Internal audio capture requires BlackHole driver. Install from https://existential.audio/blackhole/" 
+                           FontSize="12" TextColor="#fff" LineBreakMode="WordWrap" />
+                    <Label Text="Android: Requires RECORD_AUDIO and SYSTEM_ALERT_WINDOW permissions for overlay." 
+                           FontSize="12" TextColor="#fff" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Getting Started -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Getting Started" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    <Label Text="1. Download the Vosk English model (tap 'Initialize/Download Model')" 
+                           FontSize="12" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    <Label Text="2. Grant microphone permission when prompted" 
+                           FontSize="12" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    <Label Text="3. Select audio source (system audio or microphone)" 
+                           FontSize="12" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    <Label Text="4. Tap 'Start Capture' to begin generating subtitles" 
+                           FontSize="12" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    <Label Text="5. Export as SRT when done" 
+                           FontSize="12" TextColor="#aaa" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Audio Source Selection -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Audio Source Selection" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    
+                    <VerticalStackLayout Spacing="5" Padding="10" BackgroundColor="#1a1a1a">
+                        <Label Text="Windows" FontSize="12" FontAttributes="Bold" TextColor="#0f0" />
+                        <Label Text="• System Audio: WASAPI loopback (automatically detected)" 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                        <Label Text="• Microphone: Fallback if loopback unavailable" 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5" Padding="10" BackgroundColor="#1a1a1a">
+                        <Label Text="Android" FontSize="12" FontAttributes="Bold" TextColor="#0f0" />
+                        <Label Text="• System Audio: AudioPlaybackCapture (Android 10+)" 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                        <Label Text="• Microphone: Fallback for older Android or if app capture denied" 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="5" Padding="10" BackgroundColor="#1a1a1a">
+                        <Label Text="iOS" FontSize="12" FontAttributes="Bold" TextColor="#0f0" />
+                        <Label Text="• Microphone: Only option available (due to iOS restrictions)" 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                        <Label Text="• Workaround: Use external loopback hardware or route audio via speaker" 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- FAQ -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="FAQ" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Q: How large is the model?" FontSize="12" FontAttributes="Bold" TextColor="#fff" />
+                        <Label Text="A: The small English model is ~50MB. Full model is ~250MB." 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Q: Does it work offline?" FontSize="12" FontAttributes="Bold" TextColor="#fff" />
+                        <Label Text="A: Yes! Once the model is downloaded, AUTOCAP works completely offline." 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Q: Is my audio private?" FontSize="12" FontAttributes="Bold" TextColor="#fff" />
+                        <Label Text="A: Yes! All audio processing happens locally. Nothing is uploaded to cloud servers." 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Q: What is the accuracy?" FontSize="12" FontAttributes="Bold" TextColor="#fff" />
+                        <Label Text="A: Vosk accuracy depends on audio quality and background noise. Expect ~70-80% for clean audio." 
+                               FontSize="11" TextColor="#aaa" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Credits -->
+            <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Credits &amp; Open Source" FontSize="14" FontAttributes="Bold" TextColor="#fff" />
+                    <Label Text="• Vosk: Offline speech recognition" FontSize="11" TextColor="#aaa" />
+                    <Label Text="• .NET MAUI: Cross-platform UI framework" FontSize="11" TextColor="#aaa" />
+                    <Label Text="• SQLite: Local database" FontSize="11" TextColor="#aaa" />
+                    <Label Text="AUTOCAP is released under the MIT License" FontSize="11" TextColor="#aaa" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
