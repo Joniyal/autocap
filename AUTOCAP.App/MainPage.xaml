@@ -86,7 +86,7 @@
                            FontSize="11" TextColor="#888" />
                     
                     <Label Text="Vertical Position" FontSize="12" TextColor="#aaa" />
-                    <Slider x:Name="PositionSlider" Minimum="50" Maximum="300" Value="80" 
+                    <Slider x:Name="PositionSlider" Minimum="50" Maximum="300" Value="100" 
                             ValueChanged="OnPositionChanged"
                             MinimumTrackColor="#0d47a1" MaximumTrackColor="#555" />
                     <Label Text="{Binding Source={x:Reference PositionSlider}, Path=Value, StringFormat='Bottom margin: {0:F0}px'}" 

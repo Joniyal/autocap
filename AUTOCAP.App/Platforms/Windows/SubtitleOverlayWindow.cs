@@ -50,9 +50,13 @@ public class SubtitleOverlayWindow : IDisposable
         // Create an independent overlay window that won't be affected by parent
         _overlayWindow = new Window
         {
-            Title = "AUTOCAP Subtitles",
-            ExtendsContentIntoTitleBar = true
+            Title = "AUTOCAP Subtitles"
         };
+        
+        // Make window completely borderless - no title bar, no buttons
+        _overlayWindow.ExtendsContentIntoTitleBar = true;
+        _overlayWindow.AppWindow.TitleBar.IconShowOptions = Microsoft.UI.Windowing.IconShowOptions.HideIconAndSystemMenu;
+        _overlayWindow.AppWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.CompactOverlay);
         
         // Remove system backdrop for full transparency
         _overlayWindow.SystemBackdrop = null;
@@ -79,6 +83,13 @@ public class SubtitleOverlayWindow : IDisposable
             VerticalAlignment = VerticalAlignment.Center
         };
         
+        // Add right-click menu for easy control
+        var menuFlyout = new Microsoft.UI.Xaml.Controls.MenuFlyout();
+        var hideItem = new Microsoft.UI.Xaml.Controls.MenuFlyoutItem { Text = "Hide Subtitles" };
+        hideItem.Click += (s, e) => HideOverlay();
+        menuFlyout.Items.Add(hideItem);
+        textBackground.ContextFlyout = menuFlyout;
+        
         // Fully transparent grid container
         var grid = new Grid
         {
@@ -104,7 +115,7 @@ public class SubtitleOverlayWindow : IDisposable
         
         // Position at bottom center of screen - 150px tall subtitle area
         int subtitleHeight = 150;
-        int yPosition = screenHeight - subtitleHeight - 30; // 30px from bottom
+        int yPosition = screenHeight - subtitleHeight - 100; // 100px from bottom (visible by default)
         
         // CRITICAL: Make window independent - won't minimize with parent
         // WS_EX_TOOLWINDOW: Hides from taskbar
