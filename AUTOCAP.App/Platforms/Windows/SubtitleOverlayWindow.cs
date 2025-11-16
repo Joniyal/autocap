@@ -47,41 +47,48 @@ public class SubtitleOverlayWindow : IDisposable
 
     public void Initialize()
     {
-        // Create a borderless, completely transparent overlay window
+        // Create an independent overlay window that won't be affected by parent
         _overlayWindow = new Window
         {
-            Title = "AUTOCAP Subtitles"
+            Title = "AUTOCAP Subtitles",
+            ExtendsContentIntoTitleBar = true
         };
         
         // Remove system backdrop for full transparency
         _overlayWindow.SystemBackdrop = null;
         
-        // Create subtitle text - PURE TEXT with outline effect, no background box
+        // Create subtitle text - white bold text like movie subtitles
         _subtitleText = new TextBlock
         {
             Text = "",
-            FontSize = 36,
+            FontSize = 42,
             FontWeight = Microsoft.UI.Text.FontWeights.Bold,
             Foreground = new SolidColorBrush(Colors.White),
             TextAlignment = TextAlignment.Center,
             TextWrapping = TextWrapping.Wrap,
-            Padding = new Thickness(20)
+            Padding = new Thickness(16, 6, 16, 6)
         };
         
-        // Add text stroke/outline for visibility on any background
-        // This creates the effect like in the screenshot
-        var strokeGeometry = new Microsoft.UI.Xaml.Media.GeometryGroup();
+        // Semi-transparent black background behind text (like real subtitles)
+        var textBackground = new Border
+        {
+            Background = new SolidColorBrush(ColorHelper.FromArgb(180, 0, 0, 0)), // 70% opacity black
+            CornerRadius = new CornerRadius(4),
+            Child = _subtitleText,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
         
-        // Fully transparent grid - NO BACKGROUND AT ALL
+        // Fully transparent grid container
         var grid = new Grid
         {
             Background = new SolidColorBrush(Colors.Transparent),
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Bottom,
-            Margin = new Thickness(0, 0, 0, 80),
-            MaxWidth = 1400
+            VerticalAlignment = VerticalAlignment.Center,
+            MaxWidth = 1600,
+            Padding = new Thickness(40, 20, 40, 20)
         };
-        grid.Children.Add(_subtitleText);
+        grid.Children.Add(textBackground);
         
         _overlayWindow.Content = grid;
         
@@ -95,18 +102,21 @@ public class SubtitleOverlayWindow : IDisposable
         int screenWidth = (int)Microsoft.Maui.Devices.DeviceDisplay.Current.MainDisplayInfo.Width;
         int screenHeight = (int)Microsoft.Maui.Devices.DeviceDisplay.Current.MainDisplayInfo.Height;
         
-        // Position at bottom of screen - only 120px tall for text
-        int subtitleHeight = 120;
-        int yPosition = screenHeight - subtitleHeight;
+        // Position at bottom center of screen - 150px tall subtitle area
+        int subtitleHeight = 150;
+        int yPosition = screenHeight - subtitleHeight - 30; // 30px from bottom
         
-        // Make window TOOLWINDOW to hide from taskbar and ALT+TAB
+        // CRITICAL: Make window independent - won't minimize with parent
+        // WS_EX_TOOLWINDOW: Hides from taskbar
+        // WS_EX_NOACTIVATE: Never takes focus
+        // WS_EX_TOPMOST: Always on top
         int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
         SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE);
         
-        // Position window at bottom, topmost
+        // Position window at bottom center, ALWAYS TOPMOST
         SetWindowPos(hwnd, HWND_TOPMOST, 0, yPosition, screenWidth, subtitleHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
         
-        // Hide window initially - will only show when there's subtitle text
+        // Start hidden - will show when text appears
         ShowWindow(hwnd, SW_HIDE);
     }
 
@@ -125,10 +135,15 @@ public class SubtitleOverlayWindow : IDisposable
             if (!string.IsNullOrWhiteSpace(text))
             {
                 var hwnd = WindowNative.GetWindowHandle(_overlayWindow);
-                // SW_SHOWNA = Show window without activating it
-                ShowWindow(hwnd, SW_SHOWNA);
-                // Ensure it stays topmost
+                
+                // Force window to be ALWAYS ON TOP and VISIBLE
                 SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
+                
+                // Show the window without activating it
+                ShowWindow(hwnd, SW_SHOWNA);
+                
+                // Force topmost again to ensure it stays above everything
+                SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
             }
         });
     }

@@ -316,7 +316,7 @@ public partial class MainViewModel : ObservableObject
             {
                 _overlayWindow = new Platforms.Windows.SubtitleOverlayWindow();
                 _overlayWindow.Initialize();
-                StatusMessage = "Overlay initialized";
+                StatusMessage = "Overlay window created and initialized";
             }
             catch (Exception ex)
             {
@@ -325,12 +325,12 @@ public partial class MainViewModel : ObservableObject
             }
         }
         
-        // Show test text for 5 seconds
-        _overlayWindow.ShowSubtitle("This is a test subtitle overlay! If you see this, the overlay is working.");
-        StatusMessage = "Test subtitle shown - check your screen!";
+        // Show test text for 10 seconds (longer for testing)
+        _overlayWindow.ShowSubtitle("★ TEST SUBTITLE OVERLAY ★ This text should appear at the bottom of your screen even when the app is minimized!");
+        StatusMessage = "✓ Overlay showing! Check bottom of your screen. Minimizing app should NOT hide it.";
         
-        // Hide after 5 seconds
-        Task.Delay(5000).ContinueWith(_ =>
+        // Hide after 10 seconds
+        Task.Delay(10000).ContinueWith(_ =>
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
