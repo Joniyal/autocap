@@ -24,7 +24,7 @@ public class SubtitleOverlayWindow : IDisposable
     [DllImport("user32.dll")]
     private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
     
-    [DllImport("user32.dll")]
+    [DllImport("user32.dll", SetLastError = true)]
     private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
     
     [DllImport("user32.dll")]
@@ -32,15 +32,18 @@ public class SubtitleOverlayWindow : IDisposable
 
     private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
     private const int GWL_EXSTYLE = -20;
+    private const int GWL_STYLE = -16;
     private const int WS_EX_TRANSPARENT = 0x00000020;
     private const int WS_EX_LAYERED = 0x00080000;
+    private const int WS_EX_TOOLWINDOW = 0x00000080;
+    private const int WS_EX_NOACTIVATE = 0x08000000;
     private const uint SWP_NOSIZE = 0x0001;
     private const uint SWP_NOMOVE = 0x0002;
     private const uint SWP_NOACTIVATE = 0x0010;
     private const uint SWP_SHOWWINDOW = 0x0040;
     private const uint SWP_HIDEWINDOW = 0x0080;
     private const int SW_HIDE = 0;
-    private const int SW_SHOWNOACTIVATE = 4;
+    private const int SW_SHOWNA = 8;
 
     public void Initialize()
     {
@@ -82,7 +85,7 @@ public class SubtitleOverlayWindow : IDisposable
         
         _overlayWindow.Content = grid;
         
-        // Activate window (but hide it initially)
+        // Activate window
         _overlayWindow.Activate();
         
         // Get window handle
@@ -95,11 +98,13 @@ public class SubtitleOverlayWindow : IDisposable
         // Position at bottom of screen - only 120px tall for text
         int subtitleHeight = 120;
         int yPosition = screenHeight - subtitleHeight;
-        SetWindowPos(hwnd, HWND_TOPMOST, 0, yPosition, screenWidth, subtitleHeight, SWP_NOACTIVATE);
         
-        // Make window click-through (transparent to mouse and keyboard)
+        // Make window TOOLWINDOW to hide from taskbar and ALT+TAB
         int exStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-        SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED);
+        SetWindowLong(hwnd, GWL_EXSTYLE, exStyle | WS_EX_TRANSPARENT | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE);
+        
+        // Position window at bottom, topmost
+        SetWindowPos(hwnd, HWND_TOPMOST, 0, yPosition, screenWidth, subtitleHeight, SWP_NOACTIVATE | SWP_SHOWWINDOW);
         
         // Hide window initially - will only show when there's subtitle text
         ShowWindow(hwnd, SW_HIDE);
@@ -120,7 +125,10 @@ public class SubtitleOverlayWindow : IDisposable
             if (!string.IsNullOrWhiteSpace(text))
             {
                 var hwnd = WindowNative.GetWindowHandle(_overlayWindow);
-                ShowWindow(hwnd, SW_SHOWNOACTIVATE);
+                // SW_SHOWNA = Show window without activating it
+                ShowWindow(hwnd, SW_SHOWNA);
+                // Ensure it stays topmost
+                SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
             }
         });
     }

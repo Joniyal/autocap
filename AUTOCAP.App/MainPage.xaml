@@ -7,8 +7,9 @@
 
     <Grid RowDefinitions="*,auto" Padding="20">
         
-        <!-- Main Content -->
-        <VerticalStackLayout Spacing="15" Padding="0">
+        <!-- Main Content with ScrollView -->
+        <ScrollView>
+            <VerticalStackLayout Spacing="15" Padding="0">
             
             <!-- Status Section -->
             <Frame BorderColor="#444" CornerRadius="10" Padding="15" HasShadow="False" BackgroundColor="#2d2d2d">
@@ -54,6 +55,9 @@
                             </DataTrigger>
                         </Button.Triggers>
                     </Button>
+                    <Button Text="Test Overlay (Show Demo Text)" 
+                            Command="{Binding TestOverlayCommand}"
+                            BackgroundColor="#ff6f00" TextColor="White" FontAttributes="Bold" CornerRadius="5" />
                 </VerticalStackLayout>
             </Frame>
 
@@ -118,7 +122,8 @@
                         BackgroundColor="#c62828" TextColor="White" FontAttributes="Bold" CornerRadius="5" />
             </VerticalStackLayout>
 
-        </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
 
         <!-- Bottom Navigation -->
         <HorizontalStackLayout Grid.Row="1" Spacing="10" Padding="0,15,0,0">

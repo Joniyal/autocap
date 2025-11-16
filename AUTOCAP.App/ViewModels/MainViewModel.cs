@@ -306,6 +306,40 @@ public partial class MainViewModel : ObservableObject
         _overlayWindow.SetPosition(0, yPosition, screenWidth, subtitleHeight);
     }
 
+    [RelayCommand]
+    public void TestOverlay()
+    {
+        if (_overlayWindow == null)
+        {
+            // Initialize overlay if not done yet
+            try
+            {
+                _overlayWindow = new Platforms.Windows.SubtitleOverlayWindow();
+                _overlayWindow.Initialize();
+                StatusMessage = "Overlay initialized";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Overlay init failed: {ex.Message}";
+                return;
+            }
+        }
+        
+        // Show test text for 5 seconds
+        _overlayWindow.ShowSubtitle("This is a test subtitle overlay! If you see this, the overlay is working.");
+        StatusMessage = "Test subtitle shown - check your screen!";
+        
+        // Hide after 5 seconds
+        Task.Delay(5000).ContinueWith(_ =>
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                _overlayWindow?.HideOverlay();
+                StatusMessage = "Test subtitle hidden";
+            });
+        });
+    }
+
     private int _audioFrameCount = 0;
     
     private void OnAudioFrameReceived(object? sender, AudioFrameEventArgs e)
@@ -333,7 +367,11 @@ public partial class MainViewModel : ObservableObject
             _subtitleEngine.ProcessPartialResult(e.Text);
             
             // Show partial result in overlay window
-            _overlayWindow?.ShowSubtitle(e.Text);
+            if (_overlayWindow != null && !string.IsNullOrWhiteSpace(e.Text))
+            {
+                StatusMessage = $"Showing subtitle: {e.Text}";
+                _overlayWindow.ShowSubtitle(e.Text);
+            }
         });
     }
 
@@ -344,7 +382,11 @@ public partial class MainViewModel : ObservableObject
             _subtitleEngine.ProcessFinalResult(e.Text);
             
             // Show final result in overlay window
-            _overlayWindow?.ShowSubtitle(e.Text);
+            if (_overlayWindow != null && !string.IsNullOrWhiteSpace(e.Text))
+            {
+                StatusMessage = $"Final subtitle: {e.Text}";
+                _overlayWindow.ShowSubtitle(e.Text);
+            }
         });
     }
 
