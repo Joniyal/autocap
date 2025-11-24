@@ -33,6 +33,7 @@ public class VoskRecognizer : IDisposable
     {
         _sampleRate = sampleRate;
         Vosk.Vosk.SetLogLevel(-1); // Disable Vosk logging
+        Vosk.Vosk.GpuInit(); // Enable GPU if available for faster processing
     }
 
     /// <summary>
@@ -52,6 +53,10 @@ public class VoskRecognizer : IDisposable
             // Load Vosk model
             _model = new Model(modelPath);
             _recognizer = new Vosk.VoskRecognizer(_model, _sampleRate);
+            
+            // Configure for better accuracy and lower latency
+            _recognizer.SetMaxAlternatives(3); // Get top 3 alternatives for better accuracy
+            _recognizer.SetWords(true); // Enable word-level timestamps
             
             _isInitialized = true;
             return true;

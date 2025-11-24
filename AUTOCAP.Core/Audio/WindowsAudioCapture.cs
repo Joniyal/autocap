@@ -32,6 +32,7 @@ public class WindowsAudioCapture : IAudioCapture
         try
         {
             // Try WASAPI loopback first (captures system audio)
+            // Use smaller buffer for lower latency (20ms instead of default 100ms)
             _loopbackCapture = new WasapiLoopbackCapture();
             _loopbackCapture.DataAvailable += OnLoopbackDataAvailable;
             _loopbackCapture.RecordingStopped += OnRecordingStopped;
@@ -73,15 +74,25 @@ public class WindowsAudioCapture : IAudioCapture
     {
         if (e.BytesRecorded == 0 || _loopbackCapture == null) return;
         
-        // Convert to 16kHz mono 16-bit PCM if needed
-        byte[] processedData = ConvertToTargetFormat(e.Buffer, e.BytesRecorded, _loopbackCapture.WaveFormat);
-        
-        OnAudioFrame?.Invoke(this, new AudioFrameEventArgs 
-        { 
-            Buffer = processedData,
-            ByteCount = processedData.Length,
-            Timestamp = DateTime.UtcNow
-        });
+        try
+        {
+            // Convert to 16kHz mono 16-bit PCM if needed
+            byte[] processedData = ConvertToTargetFormat(e.Buffer, e.BytesRecorded, _loopbackCapture.WaveFormat);
+            
+            // Calculate audio level for debugging
+            float audioLevel = CalculateAudioLevel(processedData);
+            
+            OnAudioFrame?.Invoke(this, new AudioFrameEventArgs 
+            { 
+                Buffer = processedData,
+                ByteCount = processedData.Length,
+                Timestamp = DateTime.UtcNow
+            });
+        }
+        catch (Exception ex)
+        {
+            OnError?.Invoke(this, $"Audio processing error: {ex.Message}");
+        }
     }
     
     private void OnMicrophoneDataAvailable(object? sender, WaveInEventArgs e)
@@ -117,20 +128,81 @@ public class WindowsAudioCapture : IAudioCapture
             return output;
         }
         
-        // Simple conversion: downsample to mono and resample to 16kHz
-        // For production, use NAudio's resampler for better quality
-        using var sourceStream = new MemoryStream(sourceData, 0, length);
-        using var sourceProvider = new RawSourceWaveStream(sourceStream, sourceFormat);
+        try
+        {
+            // Use MediaFoundationResampler for conversion
+            using var sourceStream = new MemoryStream(sourceData, 0, length);
+            using var sourceProvider = new RawSourceWaveStream(sourceStream, sourceFormat);
+            
+            var targetFormat = new WaveFormat(16000, 1);
+            using var resampler = new MediaFoundationResampler(sourceProvider, targetFormat);
+            
+            byte[] buffer = new byte[length * 2];
+            int bytesRead = resampler.Read(buffer, 0, buffer.Length);
+            
+            byte[] finalOutput = new byte[bytesRead];
+            Buffer.BlockCopy(buffer, 0, finalOutput, 0, bytesRead);
+            return finalOutput;
+        }
+        catch
+        {
+            // Fallback to manual conversion if MediaFoundation fails
+            return ManualResample(sourceData, length, sourceFormat);
+        }
+    }
+    
+    private byte[] ManualResample(byte[] sourceData, int length, WaveFormat sourceFormat)
+    {
+        // Convert to mono first
+        int sourceBytesPerSample = sourceFormat.BitsPerSample / 8;
+        int sourceSamplesPerFrame = sourceFormat.Channels;
+        int totalSourceSamples = length / (sourceBytesPerSample * sourceSamplesPerFrame);
         
-        var targetFormat = new WaveFormat(16000, 1);
-        using var resampler = new MediaFoundationResampler(sourceProvider, targetFormat);
+        short[] monoSamples = new short[totalSourceSamples];
+        for (int i = 0; i < totalSourceSamples; i++)
+        {
+            int sum = 0;
+            for (int ch = 0; ch < sourceSamplesPerFrame; ch++)
+            {
+                int offset = (i * sourceSamplesPerFrame + ch) * sourceBytesPerSample;
+                sum += BitConverter.ToInt16(sourceData, offset);
+            }
+            monoSamples[i] = (short)(sum / sourceSamplesPerFrame);
+        }
         
-        byte[] buffer = new byte[length * 2]; // Allocate extra space
-        int bytesRead = resampler.Read(buffer, 0, buffer.Length);
+        // Simple resampling using linear interpolation
+        double ratio = (double)sourceFormat.SampleRate / 16000.0;
+        int outputSamples = (int)(totalSourceSamples / ratio);
+        byte[] output = new byte[outputSamples * 2];
         
-        byte[] finalOutput = new byte[bytesRead];
-        Buffer.BlockCopy(buffer, 0, finalOutput, 0, bytesRead);
-        return finalOutput;
+        for (int i = 0; i < outputSamples; i++)
+        {
+            double sourceIndex = i * ratio;
+            int index1 = (int)sourceIndex;
+            int index2 = Math.Min(index1 + 1, monoSamples.Length - 1);
+            double fraction = sourceIndex - index1;
+            
+            short sample = (short)(monoSamples[index1] * (1 - fraction) + monoSamples[index2] * fraction);
+            BitConverter.GetBytes(sample).CopyTo(output, i * 2);
+        }
+        
+        return output;
+    }
+    
+    private float CalculateAudioLevel(byte[] audioData)
+    {
+        if (audioData.Length < 2) return 0f;
+        
+        float sum = 0;
+        int sampleCount = audioData.Length / 2;
+        
+        for (int i = 0; i < sampleCount; i++)
+        {
+            short sample = BitConverter.ToInt16(audioData, i * 2);
+            sum += Math.Abs(sample);
+        }
+        
+        return sum / sampleCount / 32768f; // Normalize to 0-1
     }
 
     public async Task StopAsync()

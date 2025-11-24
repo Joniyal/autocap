@@ -13,13 +13,35 @@ public partial class App : MauiWinUIApplication
         // Add global exception handler to catch crashes
         AppDomain.CurrentDomain.UnhandledException += (s, e) =>
         {
-            DebugBootstrapLog.Log($"UNHANDLED EXCEPTION: {e.ExceptionObject}");
+            try
+            {
+                var ex = e.ExceptionObject as Exception;
+                DebugBootstrapLog.Log($"UNHANDLED EXCEPTION: {ex?.ToString() ?? e.ExceptionObject?.ToString() ?? "Unknown"}");
+                DebugBootstrapLog.Log($"IsTerminating: {e.IsTerminating}");
+            }
+            catch { }
         };
         
         Microsoft.UI.Xaml.Application.Current.UnhandledException += (s, e) =>
         {
-            DebugBootstrapLog.Log($"XAML UNHANDLED EXCEPTION: {e.Exception}");
-            e.Handled = true; // Prevent crash
+            try
+            {
+                DebugBootstrapLog.Log($"XAML UNHANDLED EXCEPTION: {e.Exception}");
+                DebugBootstrapLog.Log($"Message: {e.Message}");
+                e.Handled = true; // Prevent crash
+            }
+            catch { }
+        };
+        
+        // Catch unobserved Task exceptions (async crashes)
+        TaskScheduler.UnobservedTaskException += (s, e) =>
+        {
+            try
+            {
+                DebugBootstrapLog.Log($"UNOBSERVED TASK EXCEPTION: {e.Exception}");
+                e.SetObserved(); // Prevent crash
+            }
+            catch { }
         };
     }
 
