@@ -55,9 +55,9 @@ public class WinFormsOverlay : Form
         // Enable double buffering for smooth rendering
         DoubleBuffered = true;
         
-        // Timer for refresh
+        // Timer for refresh (faster redraw for lower perceived latency)
         _refreshTimer = new System.Windows.Forms.Timer();
-        _refreshTimer.Interval = 100;
+        _refreshTimer.Interval = 33; // ~30 FPS
         _refreshTimer.Tick += (s, e) => Invalidate();
         _refreshTimer.Start();
     }

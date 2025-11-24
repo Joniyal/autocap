@@ -119,16 +119,16 @@ public class WhisperRecognizer : IDisposable
     {
         try
         {
-            // Process every 3 seconds of audio for better Whisper detection
-            int chunkSize = _sampleRate * 3; // 3 second chunks - Whisper needs longer audio
+            // Process smaller chunks to reduce latency (1 second chunks)
+            int chunkSize = _sampleRate * 1; // 1 second chunks for lower latency
             
             while (!(_processingCts?.IsCancellationRequested ?? true))
             {
                 try
                 {
                     float[]? chunk = null;
-                    
-                    lock (_bufferLock)
+                        // Wait a short time before checking buffer again (low latency)
+                        await Task.Delay(20);
                     {
                         if (_audioBuffer.Count >= chunkSize)
                         {
@@ -167,7 +167,8 @@ public class WhisperRecognizer : IDisposable
                                         });
 
                                         // Also emit as final after a short delay
-                                        await Task.Delay(100);
+                                        // Also emit as final after a very short delay
+                                        await Task.Delay(20);
                                         OnFinalResult?.Invoke(this, new FinalResultEventArgs
                                         {
                                             Text = segment.Text.Trim(),

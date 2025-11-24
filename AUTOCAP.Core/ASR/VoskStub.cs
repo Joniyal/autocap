@@ -59,17 +59,17 @@ public class VoskRecognizerStub
 
         if (_demoMode)
         {
-            // Simple heuristic: every N calls emit a partial, after M calls emit a final
+            // Make demo much faster: emit partials every 5 frames and finals every 15 frames
             _bufferedFrames++;
-            if (_bufferedFrames % 20 == 0)
+            if (_bufferedFrames % 5 == 0)
             {
-                var idx = (_bufferedFrames / 20 - 1) % _demoLines.Length;
+                var idx = (_bufferedFrames / 5 - 1) % _demoLines.Length;
                 OnPartialResult?.Invoke(_demoLines[idx]);
             }
 
-            if (_bufferedFrames >= 60)
+            if (_bufferedFrames >= 15)
             {
-                var idx = (_bufferedFrames / 20 - 1) % _demoLines.Length;
+                var idx = (_bufferedFrames / 5 - 1) % _demoLines.Length;
                 OnFinalResult?.Invoke(_demoLines[idx]);
                 _bufferedFrames = 0;
             }
@@ -91,5 +91,18 @@ public class VoskRecognizerStub
         }
 
         OnFinalResult?.Invoke("Demo subtitle text");
+    }
+
+    /// <summary>
+    /// Enable or disable demo mode at runtime
+    /// </summary>
+    public void SetDemoMode(bool enabled)
+    {
+        _demoMode = enabled;
+        _bufferedFrames = 0;
+        if (enabled && _model == null)
+        {
+            _model = new VoskModel("<demo>");
+        }
     }
 }
