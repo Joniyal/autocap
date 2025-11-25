@@ -24,7 +24,8 @@ public class VoskRecognizerStub
         "This is a simulated subtitle.",
         "Testing live captions using Vosk stub.",
         "Try speaking now — this is simulated output.",
-        "Demo final subtitle line."
+        "Demo final subtitle line.",
+        "(Demo) quick caption sample added for packaging tests."
     };
     public event Action<string>? OnPartialResult;
     public event Action<string>? OnFinalResult;
