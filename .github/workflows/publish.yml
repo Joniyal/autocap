@@ -1,0 +1,26 @@
+name: Publish Artifacts
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore
+      - name: Publish self-contained
+        run: |
+          dotnet publish AUTOCAP.App -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true -o ./publish/win-x64
+      - name: Upload publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish-win-x64
+          path: publish/win-x64
