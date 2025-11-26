@@ -1,0 +1,35 @@
+name: Release Build & Artifacts
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Restore
+        run: dotnet restore
+      - name: Publish
+        run: |
+          dotnet publish AUTOCAP.App -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true -o ./publish/win-x64
+      - name: Build installer (Inno)
+        run: |
+          # Attempt to build Inno installer if Inno is available on the runner
+          if (Test-Path "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe") {
+            "Found Inno Setup, building installer..."
+            & "C:\\Program Files (x86)\\Inno Setup 6\\ISCC.exe" "packaging\\autocap_installer.iss" /O"packaging\\output"
+          } else {
+            Write-Host "Inno Setup not available on runner; skipping installer build."
+          }
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-publish
+          path: publish/win-x64
