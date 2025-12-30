@@ -1,5 +1,7 @@
 # AUTOCAP - Complete File Index & Documentation
 
+Note: File index updated for clarity (minor edits).
+
 ## 📑 Start Here
 
 **New to AUTOCAP?** Start with one of these:
