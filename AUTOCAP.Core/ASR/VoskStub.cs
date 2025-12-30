@@ -31,6 +31,9 @@ public class VoskRecognizerStub
     public event Action<string>? OnFinalResult;
     public event Action<string>? OnError;
 
+    // NOTE: This demo stub emits simulated partial and final events
+    // to support offline testing and packaging verification.
+
     public void InitializeModel(string modelPath)
     {
         // Allow a special "DEMO" modelPath or empty/null to enable a simulated demo mode
