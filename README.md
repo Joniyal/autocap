@@ -58,6 +58,8 @@ git clone https://github.com/yourusername/AUTOCAP.git
 cd AUTOCAP
 ```
 
+Replace 'yourusername' with your GitHub username if cloning your fork.
+
 ### 2. Download Vosk English Model
 
 The app includes a built-in model manager. Launch the app and tap **"Initialize/Download Model"**.
