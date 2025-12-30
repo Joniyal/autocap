@@ -128,4 +128,10 @@ public class SubtitleEngineTests
         // Assert
         Assert.NotEmpty(engine.GetSubtitleLines());
     }
+
+    [Fact]
+    public void Sanity_Check()
+    {
+        Assert.True(true);
+    }
 }
